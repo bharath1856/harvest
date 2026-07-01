@@ -1,7 +1,4 @@
-'use client';
-
-import { motion, useReducedMotion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface ChartCardProps {
@@ -10,7 +7,6 @@ interface ChartCardProps {
   className?: string;
   children: React.ReactNode;
   action?: React.ReactNode;
-  index?: number;
 }
 
 export function ChartCard({
@@ -19,28 +15,19 @@ export function ChartCard({
   className,
   children,
   action,
-  index = 0,
 }: ChartCardProps) {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: reduceMotion ? 0 : 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.06 }}
-    >
-      <Card className={cn(className)}>
-        <CardHeader className="flex flex-row items-start justify-between space-y-0">
-          <div>
-            <CardTitle className="text-base font-semibold">{title}</CardTitle>
-            {description && (
-              <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-            )}
-          </div>
-          {action}
-        </CardHeader>
-        <CardContent>{children}</CardContent>
-      </Card>
-    </motion.div>
+    <Card className={cn('transition-shadow hover:shadow-md', className)}>
+      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
+        <div className="min-w-0 flex-1">
+          <CardTitle className="text-sm sm:text-base font-semibold">{title}</CardTitle>
+          {description && (
+            <CardDescription className="mt-1 text-xs sm:text-sm">{description}</CardDescription>
+          )}
+        </div>
+        {action}
+      </CardHeader>
+      <CardContent className="pb-4 sm:pb-6">{children}</CardContent>
+    </Card>
   );
 }

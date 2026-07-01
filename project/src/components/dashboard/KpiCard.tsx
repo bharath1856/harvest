@@ -1,6 +1,5 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, ArrowDownRight, type LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -22,46 +21,47 @@ export function KpiCard({
   changeLabel,
   icon: Icon,
   accent = 'bg-primary/10 text-primary',
-  index = 0,
 }: KpiCardProps) {
-  const reduceMotion = useReducedMotion();
   const positive = (change ?? 0) >= 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: reduceMotion ? 0 : 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.06 }}
-    >
-      <Card className="overflow-hidden transition-shadow hover:shadow-md">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between">
-            <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', accent)}>
-              <Icon className="h-5 w-5" />
-            </div>
-            {change !== undefined && (
-              <div
-                className={cn(
-                  'flex items-center gap-0.5 text-xs font-semibold',
-                  positive ? 'text-success' : 'text-destructive'
-                )}
-              >
-                {positive ? (
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                ) : (
-                  <ArrowDownRight className="h-3.5 w-3.5" />
-                )}
-                {Math.abs(change)}%
-              </div>
+    <Card className="group overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-border/80">
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-2">
+          <div
+            className={cn(
+              'flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl transition-transform duration-200 group-hover:scale-105',
+              accent
             )}
+            aria-hidden="true"
+          >
+            <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <p className="mt-4 text-2xl font-bold tracking-tight">{value}</p>
-          <p className="mt-0.5 text-sm text-muted-foreground">{label}</p>
-          {changeLabel && (
-            <p className="mt-1 text-xs text-muted-foreground/70">{changeLabel}</p>
+          {change !== undefined && (
+            <div
+              className={cn(
+                'flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold',
+                positive ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
+              )}
+              aria-label={`${positive ? 'Up' : 'Down'} ${Math.abs(change)}%`}
+            >
+              {positive ? (
+                <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+              ) : (
+                <ArrowDownRight className="h-3 w-3" aria-hidden="true" />
+              )}
+              <span>{Math.abs(change)}%</span>
+            </div>
           )}
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+        <div className="mt-3 sm:mt-4">
+          <p className="text-xl sm:text-2xl font-bold tracking-tight">{value}</p>
+          <p className="mt-0.5 text-xs sm:text-sm text-muted-foreground">{label}</p>
+          {changeLabel && (
+            <p className="mt-0.5 sm:mt-1 text-xs text-muted-foreground/70">{changeLabel}</p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

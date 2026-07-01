@@ -1,6 +1,3 @@
-'use client';
-
-import { motion, useReducedMotion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getIcon } from '@/lib/icons';
 import { cn } from '@/lib/utils';
@@ -17,7 +14,6 @@ export interface ActivityItem {
 interface ActivityFeedProps {
   items: ActivityItem[];
   title?: string;
-  index?: number;
 }
 
 const toneStyles: Record<string, string> = {
@@ -30,50 +26,48 @@ const toneStyles: Record<string, string> = {
 export function ActivityFeed({
   items,
   title = 'Recent Activity',
-  index = 0,
 }: ActivityFeedProps) {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: reduceMotion ? 0 : 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.06 }}
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">{title}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-1">
-          {items.map((item) => {
-            const Icon = getIcon(item.icon);
-            return (
+    <Card className="h-full">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm sm:text-base font-semibold">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-1 px-4 pb-4">
+        {items.map((item) => {
+          const Icon = getIcon(item.icon);
+          return (
+            <article
+              key={item.id}
+              className="flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-secondary/50 cursor-pointer"
+              tabIndex={0}
+              role="button"
+              aria-label={`${item.title}: ${item.description}`}
+            >
               <div
-                key={item.id}
-                className="flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-secondary/50"
+                className={cn(
+                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                  toneStyles[item.tone ?? 'default']
+                )}
+                aria-hidden="true"
               >
-                <div
-                  className={cn(
-                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-                    toneStyles[item.tone ?? 'default']
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium leading-tight">{item.title}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
-                    {item.description}
-                  </p>
-                </div>
-                <span className="shrink-0 text-xs text-muted-foreground/70">
-                  {item.time}
-                </span>
+                <Icon className="h-4 w-4" />
               </div>
-            );
-          })}
-        </CardContent>
-      </Card>
-    </motion.div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium leading-tight">{item.title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
+                  {item.description}
+                </p>
+              </div>
+              <time
+                className="shrink-0 text-xs text-muted-foreground/70"
+                dateTime={item.time}
+              >
+                {item.time}
+              </time>
+            </article>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }

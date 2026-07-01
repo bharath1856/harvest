@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import {
   Sprout,
   ShoppingBasket,
@@ -52,6 +52,12 @@ const iconMap: Record<string, LucideIcon> = {
   Warehouse,
 };
 
+const fadeInVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] as const } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const { setRole, setBuyerType } = useApp();
@@ -65,19 +71,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const fadeUp = (delay: number) => ({
-    initial: { opacity: 0, y: reduceMotion ? 0 : 16 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.4, delay, ease: 'easeOut' as const },
-  });
-
   function handleRoleSelect(role: Role) {
     setSelectedRole(role);
-    if (role === 'buyer' || role === 'bulk-buyer') {
-      setStep('details');
-    } else {
-      setStep('details');
-    }
+    setStep('details');
   }
 
   function handleSignIn(e: React.FormEvent) {
@@ -97,7 +93,7 @@ export default function LoginPage() {
       if (selectedBuyerType) setBuyerType(selectedBuyerType);
       toast.success(`Signed in as ${roleMeta[selectedRole].label}`);
       router.push(getDashboardPath(selectedRole));
-    }, 600);
+    }, 500);
   }
 
   const needsBuyerType =
@@ -107,7 +103,11 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background lg:flex-row">
       {/* Left panel — branding */}
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-primary via-emerald-700 to-emerald-900 lg:flex lg:w-1/2 lg:flex-col lg:justify-between lg:p-12">
+      <div
+        className="relative hidden overflow-hidden bg-gradient-to-br from-primary via-emerald-700 to-emerald-900 lg:flex lg:w-1/2 lg:flex-col lg:justify-between lg:p-10 xl:p-12"
+        role="presentation"
+        aria-hidden="true"
+      >
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -116,31 +116,31 @@ export default function LoginPage() {
             backgroundSize: '28px 28px',
           }}
         />
-        <Link href="/" className="relative flex items-center gap-2.5 text-white">
+        <Link href="/" className="relative flex items-center gap-2.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-primary rounded-md">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 backdrop-blur">
-            <Sprout className="h-5 w-5" />
+            <Sprout className="h-5 w-5" aria-hidden="true" />
           </div>
           <span className="font-display text-lg font-bold">
             Harvest<span className="text-white/70">Link</span>
           </span>
         </Link>
         <div className="relative text-white">
-          <h2 className="font-display text-3xl font-bold leading-tight">
+          <h2 className="font-display text-2xl font-bold leading-tight xl:text-3xl">
             Welcome back to the future of farming.
           </h2>
-          <p className="mt-4 max-w-md text-white/80">
+          <p className="mt-4 max-w-md text-white/80 text-sm xl:text-base">
             Choose your role to access a tailored dashboard built for your part of
             the agricultural supply chain.
           </p>
-          <div className="mt-8 flex items-center gap-6 text-sm text-white/70">
+          <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-white/70 sm:text-sm sm:gap-6">
             <div className="flex items-center gap-2">
-              <Check className="h-4 w-4" /> AI insights
+              <Check className="h-4 w-4" aria-hidden="true" /> AI insights
             </div>
             <div className="flex items-center gap-2">
-              <Check className="h-4 w-4" /> Real-time tracking
+              <Check className="h-4 w-4" aria-hidden="true" /> Real-time tracking
             </div>
             <div className="flex items-center gap-2">
-              <Check className="h-4 w-4" /> Full traceability
+              <Check className="h-4 w-4" aria-hidden="true" /> Full traceability
             </div>
           </div>
         </div>
@@ -151,178 +151,217 @@ export default function LoginPage() {
 
       {/* Right panel — form */}
       <div className="flex flex-1 flex-col">
-        <div className="flex items-center justify-between p-4 sm:p-6">
+        <header className="flex items-center justify-between p-4 sm:p-6">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back home
           </Link>
-          <Link href="/" className="flex items-center gap-2.5 lg:hidden">
+          <Link href="/" className="flex items-center gap-2.5 lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-emerald-700 text-white">
-              <Sprout className="h-4 w-4" />
+              <Sprout className="h-4 w-4" aria-hidden="true" />
             </div>
             <span className="font-display text-base font-bold">
               Harvest<span className="text-primary">Link</span>
             </span>
           </Link>
-        </div>
+        </header>
 
-        <div className="flex flex-1 items-center justify-center px-4 pb-12 sm:px-6">
+        <main className="flex flex-1 items-center justify-center px-4 pb-12 sm:px-6">
           <div className="w-full max-w-md">
-            {step === 'role' && (
-              <motion.div {...fadeUp(0)}>
-                <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
-                  Step 1 of 2
-                </Badge>
-                <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                  Choose your role
-                </h1>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Select a role to explore its dedicated dashboard experience.
-                </p>
-                <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {roleList.map((role, i) => {
-                    const Icon = iconMap[role.icon] ?? Sprout;
-                    const isSelected = selectedRole === role.id;
-                    return (
-                      <motion.button
-                        key={role.id}
-                        {...fadeUp(i * 0.04)}
-                        onClick={() => handleRoleSelect(role.id)}
-                        className={`group flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
-                          isSelected
-                            ? 'border-primary bg-primary/5 shadow-md'
-                            : 'border-border hover:border-primary/40 hover:bg-secondary/50'
-                        }`}
-                      >
-                        <div
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${role.accent} text-white shadow-sm`}
-                        >
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold">{role.label}</p>
-                          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                            {role.description}
-                          </p>
-                        </div>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-
-            {step === 'details' && currentMeta && (
-              <motion.div {...fadeUp(0)}>
-                <button
-                  onClick={() => setStep('role')}
-                  className="mb-4 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            <AnimatePresence mode="wait">
+              {step === 'role' && (
+                <motion.div
+                  key="step-role"
+                  variants={fadeInVariants}
+                  initial={reduceMotion ? false : 'hidden'}
+                  animate={reduceMotion ? undefined : 'visible'}
+                  exit={reduceMotion ? undefined : 'exit'}
                 >
-                  <ArrowLeft className="h-4 w-4" />
-                  Change role
-                </button>
-                <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
-                  Step 2 of 2
-                </Badge>
-                <div className="mb-6 flex items-center gap-3">
+                  <Badge variant="outline" className="mb-3 border-primary/30 text-primary">
+                    Step 1 of 2
+                  </Badge>
+                  <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                    Choose your role
+                  </h1>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Select a role to explore its dedicated dashboard experience.
+                  </p>
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${currentMeta.accent} text-white shadow-sm`}
+                    className="mt-6 grid grid-cols-1 gap-2.5 sm:mt-8 sm:grid-cols-2 sm:gap-3"
+                    role="radiogroup"
+                    aria-label="Select your role"
                   >
-                    {(() => {
-                      const Icon = iconMap[currentMeta.icon] ?? Sprout;
-                      return <Icon className="h-6 w-6" />;
-                    })()}
-                  </div>
-                  <div>
-                    <h1 className="font-display text-xl font-bold">{currentMeta.label}</h1>
-                    <p className="text-sm text-muted-foreground">{currentMeta.tagline}</p>
-                  </div>
-                </div>
-
-                {needsBuyerType && (
-                  <div className="mb-6">
-                    <Label className="mb-2 block">Buyer type</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {buyerTypes.map((bt) => (
-                        <button
-                          key={bt.id}
-                          type="button"
-                          onClick={() => setSelectedBuyerType(bt.id)}
-                          className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
-                            selectedBuyerType === bt.id
-                              ? 'border-primary bg-primary/5 text-primary'
-                              : 'border-border hover:border-primary/40'
+                    {roleList.map((role, i) => {
+                      const Icon = iconMap[role.icon] ?? Sprout;
+                      const isSelected = selectedRole === role.id;
+                      return (
+                        <motion.button
+                          key={role.id}
+                          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: i * 0.03 }}
+                          onClick={() => handleRoleSelect(role.id)}
+                          role="radio"
+                          aria-checked={isSelected}
+                          className={`group flex items-start gap-2.5 sm:gap-3 rounded-lg sm:rounded-xl border p-3 sm:p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                            isSelected
+                              ? 'border-primary bg-primary/5 shadow-sm'
+                              : 'border-border hover:border-primary/40 hover:bg-secondary/50'
                           }`}
                         >
-                          {bt.label}
-                        </button>
-                      ))}
-                    </div>
+                          <div
+                            className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${role.accent} text-white shadow-sm`}
+                            aria-hidden="true"
+                          >
+                            <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">{role.label}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                              {role.description}
+                            </p>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
                   </div>
-                )}
+                </motion.div>
+              )}
 
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="you@harvestlink.com"
-                        className="pl-9"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
+              {step === 'details' && currentMeta && (
+                <motion.div
+                  key="step-details"
+                  variants={fadeInVariants}
+                  initial={reduceMotion ? false : 'hidden'}
+                  animate={reduceMotion ? undefined : 'visible'}
+                  exit={reduceMotion ? undefined : 'exit'}
+                >
+                  <button
+                    onClick={() => setStep('role')}
+                    className="mb-3 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+                  >
+                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                    Change role
+                  </button>
+                  <Badge variant="outline" className="mb-3 border-primary/30 text-primary">
+                    Step 2 of 2
+                  </Badge>
+                  <div className="mb-5 flex items-center gap-3 sm:mb-6">
+                    <div
+                      className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br ${currentMeta.accent} text-white shadow-sm`}
+                      aria-hidden="true"
+                    >
+                      {(() => {
+                        const Icon = iconMap[currentMeta.icon] ?? Sprout;
+                        return <Icon className="h-5 w-5 sm:h-6 sm:w-6" />;
+                      })()}
+                    </div>
+                    <div>
+                      <h1 className="font-display text-lg font-bold sm:text-xl">{currentMeta.label}</h1>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{currentMeta.tagline}</p>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="••••••••"
-                        className="pl-9 pr-9"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((s) => !s)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
+
+                  {needsBuyerType && (
+                    <fieldset className="mb-5 sm:mb-6">
+                      <legend className="mb-2 block text-sm font-medium">Buyer type</legend>
+                      <div className="grid grid-cols-2 gap-2" role="radiogroup">
+                        {buyerTypes.map((bt) => (
+                          <button
+                            key={bt.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={selectedBuyerType === bt.id}
+                            onClick={() => setSelectedBuyerType(bt.id)}
+                            className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                              selectedBuyerType === bt.id
+                                ? 'border-primary bg-primary/5 text-primary'
+                                : 'border-border hover:border-primary/40'
+                            }`}
+                          >
+                            {bt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
+                  )}
+
+                  <form onSubmit={handleSignIn} className="space-y-4" noValidate>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="you@harvestlink.com"
+                          className="pl-9"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          autoComplete="email"
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <Button type="submit" className="w-full" size="lg" disabled={loading}>
-                    {loading ? (
-                      'Signing in...'
-                    ) : (
-                      <>
-                        Sign in as {currentMeta.label}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </form>
-                <p className="mt-4 text-center text-xs text-muted-foreground">
-                  Demo mode — no real authentication. Any email and password will work.
-                </p>
-              </motion.div>
-            )}
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                        <Input
+                          id="password"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="••••••••"
+                          className="pl-9 pr-9"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          autoComplete="current-password"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((s) => !s)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" aria-hidden="true" />
+                          ) : (
+                            <Eye className="h-4 w-4" aria-hidden="true" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      size="lg"
+                      disabled={loading}
+                      aria-busy={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" aria-hidden="true" />
+                          Signing in...
+                        </>
+                      ) : (
+                        <>
+                          Sign in as {currentMeta.label}
+                          <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                  <p className="mt-4 text-center text-xs text-muted-foreground">
+                    Demo mode — no real authentication. Any email and password will work.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );

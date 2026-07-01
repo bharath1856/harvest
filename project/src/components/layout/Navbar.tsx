@@ -12,7 +12,6 @@ import {
   LogOut,
   Settings,
   User,
-  type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,7 +35,7 @@ interface NavbarProps {
 
 export function Navbar({ onMenuClick }: NavbarProps) {
   const router = useRouter();
-  const { role, setRole, sidebarCollapsed, setSidebarCollapsed, theme, setTheme, resolvedTheme } =
+  const { role, setRole, sidebarCollapsed, setSidebarCollapsed, resolvedTheme, setTheme } =
     useApp();
   const [user, setUser] = useState<MockUser | null>(null);
 
@@ -54,68 +53,84 @@ export function Navbar({ onMenuClick }: NavbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-lg sm:px-6">
+    <header
+      className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border/50 bg-background/80 glass px-3 sm:gap-3 sm:px-4 lg:px-6"
+      role="banner"
+    >
       {/* Mobile menu */}
       <Button
         variant="ghost"
         size="icon"
-        className="lg:hidden"
+        className="shrink-0 lg:hidden"
         onClick={onMenuClick}
-        aria-label="Open menu"
+        aria-label="Open navigation menu"
       >
-        <Menu className="h-5 w-5" />
+        <Menu className="h-5 w-5" aria-hidden="true" />
       </Button>
 
       {/* Collapse toggle (desktop) */}
       <Button
         variant="ghost"
         size="icon"
-        className="hidden lg:inline-flex"
+        className="hidden shrink-0 lg:inline-flex"
         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {sidebarCollapsed ? (
-          <PanelLeft className="h-5 w-5" />
+          <PanelLeft className="h-5 w-5" aria-hidden="true" />
         ) : (
-          <PanelLeftClose className="h-5 w-5" />
+          <PanelLeftClose className="h-5 w-5" aria-hidden="true" />
         )}
       </Button>
 
       {/* Search */}
       <div className="relative hidden flex-1 max-w-md sm:block">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <Input
           placeholder="Search..."
-          className="pl-9 bg-secondary/40"
+          className="pl-9 bg-secondary/50 border-transparent focus:border-primary/30"
           aria-label="Search"
         />
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-1 sm:gap-2">
         {/* Theme toggle */}
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-          aria-label="Toggle theme"
+          aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+          title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
         >
           {resolvedTheme === 'dark' ? (
-            <Sun className="h-5 w-5" />
+            <Sun className="h-5 w-5" aria-hidden="true" />
           ) : (
-            <Moon className="h-5 w-5" />
+            <Moon className="h-5 w-5" aria-hidden="true" />
           )}
         </Button>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="View notifications"
+          title="Notifications"
+          className="relative"
+        >
+          <Bell className="h-5 w-5" aria-hidden="true" />
+          <span
+            className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent"
+            aria-label="New notifications"
+          />
         </Button>
 
         {/* User menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-lg p-1 transition-colors hover:bg-secondary">
+            <button
+              className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="User menu"
+            >
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
                   {user?.name
@@ -125,7 +140,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                     .slice(0, 2) ?? 'U'}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden text-left sm:block">
+              <div className="hidden text-left md:block">
                 <p className="text-sm font-medium leading-tight">{user?.name ?? 'Loading...'}</p>
                 <p className="text-xs text-muted-foreground">{meta.label}</p>
               </div>
@@ -138,14 +153,17 @@ export function Navbar({ onMenuClick }: NavbarProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" /> Profile
+              <User className="mr-2 h-4 w-4" aria-hidden="true" /> Profile
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" /> Settings
+              <Settings className="mr-2 h-4 w-4" aria-hidden="true" /> Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
-              <LogOut className="mr-2 h-4 w-4" /> Sign out
+            <DropdownMenuItem
+              onClick={handleSignOut}
+              className="text-destructive focus:text-destructive"
+            >
+              <LogOut className="mr-2 h-4 w-4" aria-hidden="true" /> Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
